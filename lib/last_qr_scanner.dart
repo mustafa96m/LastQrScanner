@@ -84,8 +84,11 @@ class QRViewController {
       final RenderBox renderBox = qrKey.currentContext.findRenderObject();
       channel.invokeMethod("setDimensions",
           {"width": renderBox.size.width, "height": renderBox.size.height});
+    } else {
+      /// Formats decoding specification feature is only supported in
+      /// Android zxing lib
+      _setLookupFormats();
     }
-    _setLookupFormats();
   }
 
   void toggleTorch() {
