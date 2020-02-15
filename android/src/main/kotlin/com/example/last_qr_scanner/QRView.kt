@@ -10,14 +10,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import com.google.zxing.ResultPoint
-import com.journeyapps.barcodescanner.BarcodeCallback
-import com.journeyapps.barcodescanner.BarcodeResult
-import com.journeyapps.barcodescanner.BarcodeView
-import com.journeyapps.barcodescanner.DefaultDecoderFactory
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.*
+import java.util.*
+import java.util.Arrays.asList
+import kotlin.collections.ArrayList
+
 
 class QRView(context: Context, private val registrar: PluginRegistry.Registrar, id: Int) :
         PlatformView,MethodChannel.MethodCallHandler {
@@ -104,6 +106,13 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
             }
             "resumeScanner" -> {
                 barcodeView.resume()
+            }
+            "setLookupFormats" -> {
+                val formats = call.arguments as ArrayList<String>
+                val mappedFormats = formats.map { str -> BarcodeFormat.valueOf(str) }
+                val decoder = DefaultDecoderFactory(mappedFormats,null, null, false)
+                barcodeView.decoderFactory = decoder
+                result.success("done")
             }
         }
     }

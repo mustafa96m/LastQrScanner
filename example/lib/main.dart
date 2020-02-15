@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
 import 'package:last_qr_scanner/last_qr_scanner.dart';
+import 'package:last_qr_scanner/barcode_types.dart';
 
 void main() => runApp(MyApp());
 
@@ -50,6 +51,7 @@ class _MyAppState extends State<MyApp> {
             Expanded(
               child: LastQrScannerPreview(
                 key: qrKey,
+                lookupFormats: [BarcodeFormat.QR_CODE, BarcodeFormat.EAN_13],
                 onQRViewCreated: _onQRViewCreated,
               ),
               flex: 4,

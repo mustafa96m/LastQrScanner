@@ -1,12 +1,15 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
+import 'package:last_qr_scanner/barcode_types.dart';
 
 typedef void QRViewCreatedCallback(QRViewController controller);
 
 class LastQrScannerPreview extends StatefulWidget {
+  final List<BarcodeFormat> lookupFormats;
   const LastQrScannerPreview({
     Key key,
+    this.lookupFormats,
     this.onQRViewCreated,
   }) : super(key: key);
 
@@ -19,12 +22,11 @@ class LastQrScannerPreview extends StatefulWidget {
 class _QRViewState extends State<LastQrScannerPreview> {
   @override
   Widget build(BuildContext context) {
-    var androidView = AndroidView(
-      viewType: 'last_qr_scanner/qrview',
-      onPlatformViewCreated: _onPlatformViewCreated,
-    );
-
     if (defaultTargetPlatform == TargetPlatform.android) {
+      var androidView = AndroidView(
+        viewType: 'last_qr_scanner/qrview',
+        onPlatformViewCreated: _onPlatformViewCreated,
+      );
       return androidView;
     }
 
@@ -45,7 +47,7 @@ class _QRViewState extends State<LastQrScannerPreview> {
     if (widget.onQRViewCreated == null) {
       return;
     }
-    widget.onQRViewCreated(new QRViewController._(id));
+    widget.onQRViewCreated(new QRViewController._(id, widget.lookupFormats));
   }
 }
 
@@ -71,9 +73,11 @@ class _CreationParams {
 }
 
 class QRViewController {
-  QRViewController._(int id)
-      : channel = MethodChannel('last_qr_scanner/qrview_$id');
+  final List<BarcodeFormat> lookupFormats;
   final MethodChannel channel;
+
+  QRViewController._(int id, this.lookupFormats)
+      : channel = MethodChannel('last_qr_scanner/qrview_$id');
 
   void init(GlobalKey qrKey) {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -81,6 +85,7 @@ class QRViewController {
       channel.invokeMethod("setDimensions",
           {"width": renderBox.size.width, "height": renderBox.size.height});
     }
+    _setLookupFormats();
   }
 
   void toggleTorch() {
@@ -93,5 +98,10 @@ class QRViewController {
 
   void resumeScanner() {
     channel.invokeMethod("resumeScanner");
+  }
+
+  void _setLookupFormats() {
+    channel.invokeListMethod("setLookupFormats",
+        lookupFormats.map((obj) => obj.toString().split(".").last).toList());
   }
 }
