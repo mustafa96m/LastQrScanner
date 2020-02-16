@@ -15,10 +15,10 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugin.platform.PlatformView
 import com.google.zxing.BarcodeFormat
+import com.google.zxing.DecodeHintType
 import com.journeyapps.barcodescanner.*
-import java.util.*
-import java.util.Arrays.asList
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
 class QRView(context: Context, private val registrar: PluginRegistry.Registrar, id: Int) :
@@ -108,11 +108,12 @@ class QRView(context: Context, private val registrar: PluginRegistry.Registrar, 
                 barcodeView.resume()
             }
             "setLookupFormats" -> {
-                val formats = call.arguments as ArrayList<String>
-                val mappedFormats = formats.map { str -> BarcodeFormat.valueOf(str) }
-                val decoder = DefaultDecoderFactory(mappedFormats,null, null, false)
+                val formats = call.arguments as ArrayList<*>
+                val mappedFormats: List<BarcodeFormat> = formats.map { str -> BarcodeFormat.valueOf(str as String) }
+                val hints = HashMap<DecodeHintType, Any>()
+                hints[DecodeHintType.POSSIBLE_FORMATS] = mappedFormats
+                val decoder = DefaultDecoderFactory(mappedFormats, hints, null, false)
                 barcodeView.decoderFactory = decoder
-                result.success("done")
             }
         }
     }

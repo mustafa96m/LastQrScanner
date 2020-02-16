@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
@@ -104,7 +106,8 @@ class QRViewController {
   }
 
   void _setLookupFormats() {
-    channel.invokeListMethod("setLookupFormats",
-        lookupFormats.map((obj) => obj.toString().split(".").last).toList());
+    var list =
+        lookupFormats.map((obj) => obj.toString().split(".").last).toList();
+    channel.invokeListMethod("setLookupFormats",list);
   }
 }
